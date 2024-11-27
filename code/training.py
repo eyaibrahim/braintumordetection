@@ -20,34 +20,33 @@ X_train, X_test, y_train, y_test = train_test_split(
     data, labels, test_size=0.2, random_state=42
 )
 
-# Further split the training data into training and validation sets
+
 X_train, X_val, y_train, y_val = train_test_split(
     X_train, y_train, test_size=0.2, random_state=42
 )
 
-# One-hot encode the labels (since it's a binary classification problem)
+# One-hot encode 
 y_train = to_categorical(y_train, 2)
 y_val = to_categorical(y_val, 2)
 y_test = to_categorical(y_test, 2)
 
-# Check the shapes of the datasets
 print(f"Training data shape: {X_train.shape}")
 print(f"Validation data shape: {X_val.shape}")
 print(f"Test data shape: {X_test.shape}")
 
-# Build the CNN model
+# CNN model
 model = Sequential()
 
-# Input layer and first convolutional layer
+# 1
 model.add(Input(shape=(128, 128, 1)))  # Fixes the warning
 model.add(Conv2D(32, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-# Second convolutional layer
+# 2
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-# Third convolutional layer
+# 3
 model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -57,13 +56,13 @@ model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))  # Dropout to reduce overfitting
 model.add(Dense(2, activation='softmax'))  # Output layer
 
-# Compile the model
+
 model.compile(optimizer=Adam(), loss='categorical_crossentropy', metrics=['accuracy'])
 
-# Print model summary
+
 model.summary()
 
-# Model checkpointing: Save the best model based on validation loss
+# Save the best model based on validation loss
 checkpoint = ModelCheckpoint(
     'brain_tumor_cnn_best.keras',  # Save the best model in .keras format
     save_best_only=True,
@@ -72,14 +71,13 @@ checkpoint = ModelCheckpoint(
 )
 
 
-# Early stopping: Stop training when validation loss doesn't improve
 early_stopping = EarlyStopping(
     monitor='val_loss',
     patience=3,  # Stop after 3 epochs of no improvement
     restore_best_weights=True
 )
 
-# Train the model with callbacks
+
 history = model.fit(
     X_train, y_train,
     validation_data=(X_val, y_val),
@@ -88,14 +86,14 @@ history = model.fit(
     callbacks=[checkpoint, early_stopping]  # Add callbacks here
 )
 
-# Save the training history for later visualization
+
 with open('history.pkl', 'wb') as f:
     pickle.dump(history.history, f)
 
-# Save the final model (optional, since best model is already saved)
+
 model.save('brain_tumor_cnn.h5')
 
-# Plot accuracy
+
 plt.figure(figsize=(8, 6))
 plt.plot(history.history['accuracy'], label='Train Accuracy')
 plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
@@ -106,7 +104,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# Plot loss
+
 plt.figure(figsize=(8, 6))
 plt.plot(history.history['loss'], label='Train Loss')
 plt.plot(history.history['val_loss'], label='Validation Loss')
